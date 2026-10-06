@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Steel Vanguard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@500;700;800&family=Chakra+Petch:wght@400;600&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+<div id="app">
+  <div id="viewport"></div>
+
+  <!-- In-match HUD -->
+  <div id="hud" hidden>
+    <div id="vignette"></div>
+    <div id="markers"></div>
+    <div id="damage-numbers"></div>
+
+    <div id="crosshair">
+      <div class="ch-ring"></div>
+      <div class="ch-dot"></div>
+      <div class="ch-hit"></div>
+    </div>
+
+    <div id="top-center">
+      <div id="wave-label">WAVE 1</div>
+      <div id="hostiles">HOSTILES <span id="hostile-count">0</span></div>
+    </div>
+
+    <div id="boss-bar" hidden>
+      <div class="boss-name" id="boss-name">OVERLORD</div>
+      <div class="bar"><div class="fill" id="boss-fill"></div></div>
+    </div>
+
+    <div id="top-right">
+      <div class="score-label">SCORE</div>
+      <div id="score">0</div>
+      <div id="combo" hidden>x2 CHAIN</div>
+    </div>
+
+    <canvas id="radar" width="180" height="180"></canvas>
+
+    <div id="status">
+      <div class="gauge">
+        <div class="gauge-head"><span>AP</span><span id="ap-value">1000</span></div>
+        <div class="bar ap"><div class="fill" id="ap-fill"></div></div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-head"><span>EN</span><span id="en-value">100</span></div>
+        <div class="bar en"><div class="fill" id="en-fill"></div></div>
+      </div>
+    </div>
+
+    <div id="weapons">
+      <div class="weapon" id="w-rifle">
+        <div class="w-key">LMB</div>
+        <div class="w-name">PULSE RIFLE</div>
+        <div class="w-value" id="rifle-ammo">40</div>
+      </div>
+      <div class="weapon" id="w-missile">
+        <div class="w-key">RMB</div>
+        <div class="w-name">HYDRA MISSILES</div>
+        <div class="w-value" id="missile-state">READY</div>
+      </div>
+      <div class="weapon" id="w-blade">
+        <div class="w-key">F</div>
+        <div class="w-name">ARC BLADE</div>
+        <div class="w-value" id="blade-state">READY</div>
+      </div>
+    </div>
+
+    <div id="banner" hidden>
+      <div class="banner-kicker" id="banner-kicker">INCOMING</div>
+      <div class="banner-title" id="banner-title">WAVE 1</div>
+    </div>
+  </div>
+
+  <!-- Title screen -->
+  <div id="title" class="screen">
+    <div class="title-inner">
+      <div class="kicker">ARENA COMBAT SIMULATION · BUILD 0.1</div>
+      <h1>STEEL<br>VANGUARD</h1>
+      <p class="lede">Pilot the VX-7 Vanguard against wave after wave of Crimson Legion war machines. Survive the Overlord.</p>
+      <div class="title-actions">
+        <button id="start-btn" class="btn primary" type="button">LAUNCH</button>
+        <label class="quality" for="quality-select">GRAPHICS
+          <select id="quality-select">
+            <option value="high">HIGH</option>
+            <option value="low">LOW (school PC)</option>
+          </select>
+        </label>
+      </div>
+      <div class="controls">
+        <div><kbd>W A S D</kbd><span>Move</span></div>
+        <div><kbd>MOUSE</kbd><span>Aim</span></div>
+        <div><kbd>SPACE</kbd><span>Jump / hold to hover</span></div>
+        <div><kbd>SHIFT</kbd><span>Quick boost</span></div>
+        <div><kbd>LMB</kbd><span>Pulse rifle</span></div>
+        <div><kbd>RMB</kbd><span>Lock-on missiles</span></div>
+        <div><kbd>F</kbd><span>Arc blade slash</span></div>
+        <div><kbd>R</kbd><span>Reload</span></div>
+        <div><kbd>ESC</kbd><span>Pause</span></div>
+      </div>
+      <div class="best" id="best-score"></div>
+    </div>
+    <div class="roster">
+      <div class="roster-head">CRIMSON LEGION · KNOWN UNITS</div>
+      <div class="roster-item"><b>RAIDER</b><span>Fast flanker. Rapid bolts.</span></div>
+      <div class="roster-item"><b>JUGGERNAUT</b><span>Heavy armor. Plasma mortars.</span></div>
+      <div class="roster-item"><b>WRAITH</b><span>Hover unit. Homing missiles.</span></div>
+      <div class="roster-item boss"><b>OVERLORD</b><span>Command unit. Appears every 5th wave.</span></div>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div id="pause" class="screen" hidden>
+    <div class="panel">
+      <h2>PAUSED</h2>
+      <button id="resume-btn" class="btn primary" type="button">RESUME</button>
+      <button id="quit-btn" class="btn" type="button">QUIT TO TITLE</button>
+    </div>
+  </div>
+
+  <!-- Game over -->
+  <div id="gameover" class="screen" hidden>
+    <div class="panel">
+      <div class="kicker" id="go-kicker">VANGUARD DESTROYED</div>
+      <h2 id="go-title">MISSION FAILED</h2>
+      <div class="results">
+        <div><span>WAVE REACHED</span><b id="go-wave">1</b></div>
+        <div><span>UNITS DESTROYED</span><b id="go-kills">0</b></div>
+        <div><span>SCORE</span><b id="go-score">0</b></div>
+      </div>
+      <button id="retry-btn" class="btn primary" type="button">SORTIE AGAIN</button>
+      <button id="title-btn" class="btn" type="button">TITLE</button>
+    </div>
+  </div>
+
+  <div id="loading" class="screen" hidden><div class="kicker">SYSTEMS BOOTING…</div></div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
